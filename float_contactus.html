@@ -1,0 +1,45 @@
+{% load dashboard_extras %}
+{% load flytrexsite_extras %}
+
+<script src="../../static/js/float_contactus.js"></script>
+
+<link rel='stylesheet' href='../../static/css/float_contactus.css' type='text/css' media='all'/>
+
+<div class="modal custom fade" id="ContactUs" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form onsubmit="return submitContactUs(2 ,'{{ csrf_token }}');" data-toggle="validator" id="ContactUsForm_modal" role="form" method="post" action="">{% csrf_token %}
+                    <div style="font-size:24px; margin-bottom:24px; margin-top: 12px; color:#626262;"><strong>ContactUs</strong></div>
+                    <div>
+                        <input type="text" id="your_name" placeholder="Your name" required>
+                    </div>
+                    <div>
+                        <input type="email" id="email" placeholder="Email" data-error="Email address is invalid" required>
+                    </div>
+                    <div>
+                        <textarea id="comment" rows="3" placeholder="Give us your feedback"></textarea>
+                    </div>
+                    <div style="margin-top: 15px; padding-bottom:30px;">
+                        <button type="submit" class="flat-button" id="submit" style="width:142px; float:right; height:36px; font-size:10px; margin-right: 20px;">Send Message</button>
+                    </div>
+                </form>
+
+                <div id='loading_modal' style="display: none;">
+                    <div style="font-size:24px; margin-bottom:24px; margin-top: 100px; color:#626262;"><strong>Please wait while we process your information...</strong></div>
+                    <div class="loading-spinner" style="width: 460px; margin-left: 12px; margin-top: 40px; margin-bottom: 35px;">
+                        <div class="progress progress-striped active">
+                            <div class="progress-bar" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id='form_complete_modal' style="display: none; margin-top: 40px;">
+                    <img src="../../static/img/item/green_tick.png">
+                    <div style="font-size:24px; color:#626262; margin-top: 20px;"><strong>We've got your message and will contact you shortly, thank you!</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

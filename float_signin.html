@@ -1,0 +1,363 @@
+<script type="text/javascript">
+    function close_signin_overlay() {
+        $('#overlay-back-signin, #overlay-signin').fadeOut(500);
+    }
+
+    function onclick_signin(show_signin_welcome_msg) {
+
+        show_signin_welcome_msg = typeof show_signin_welcome_msg !== 'undefined' ? show_signin_welcome_msg : false;
+
+        if (show_signin_welcome_msg) {
+            $('#sign-in-welcome-msg').show();
+            $('#without-welcome-msg-spacer').hide();
+
+        } else {
+            $('#sign-in-welcome-msg').hide();
+            $('#without-welcome-msg-spacer').show();
+        }
+
+        $('#overlay-back-signin, #overlay-signin').fadeIn(500);
+    }
+
+    $(document).ready(function () {
+        $(document).mouseup(function (e) {
+            var container = $("#overlay-signin");
+            if ($(e.target).closest(container).length === 0) {
+                close_signin_overlay();
+            }
+        });
+
+        $(document).on('keydown', function (e) {
+            if (e.keyCode === 27) { // ESC
+                close_signin_overlay();
+            }
+        });
+    });
+</script>
+
+
+<link rel='stylesheet' href='{{STATIC_URL}}signin.css' type='text/css' media='all' />
+
+<div class="popup-overlay-back" id="overlay-back-signin"></div>
+<div class="popup-overlay" id="overlay-signin" style="width:540px; margin:-280px 0 0 -270px; padding:12px 40px 16px 40px;">
+
+    {% load socialaccount %}    
+    {% if register_live %}
+
+        <div style="font-size:16px; text-align:center; margin:-6px 0 20px 0; line-height:22px;">Welcome aboard! To get started, please first sign-in using one of the options below.</div>
+    
+        <a href="{% provider_login_url "facebook" method="oauth2" next=next_url %}" class="signin"><div class="signin-button facebook"></div></a>
+        <a href="{% provider_login_url "twitter" next=next_url %}" class="signin"><div class="signin-button twitter"></div></a>
+        <a href="{% provider_login_url "google" method="oauth2" next=next_url %}" class="signin"><div class="signin-button google" style="margin-bottom:0;"></div></a>
+
+    {% else %}
+
+        <p style="font-size: 16px; line-height: 26px; text-align: center; display:none;" id="sign-in-welcome-msg">Not on Flytrex? Sign in, join pilots from around the<br />world and discover the new multirotor experience.</p>
+        <div style="height:20px; display:none;" id="without-welcome-msg-spacer"></div>
+
+        <div id="signin_form" style="float:left; text-align:center; width:100%; margin-top:12px;">
+
+            <a href="{% provider_login_url "facebook" method="oauth2" next=next_url %}" class="signin"><div class="signin-button facebook"></div></a>
+            <a href="{% provider_login_url "twitter" next=next_url %}" class="signin"><div class="signin-button twitter"></div></a>
+            <a href="{% provider_login_url "google" method="oauth2" next=next_url %}" class="signin"><div class="signin-button google" style="margin-bottom:0;"></div></a>
+
+            <div style="font-size:24px; margin:32px 0 6px 0; color:#a0a0a0;">Or, sign in using <strong>email</strong></div>
+
+            <form class="auth-form" method="post" action="/accounts/login/" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next_url }}" />
+                <div>
+                    <input type="text" id="login" name="login" style="background-color:#dddddd; color:#525252; border:0; -moz-border-radius: 3px; -webkit-border-radius: 3px; -o-border-radius: 3px; -ms-border-radius: 3px; -khtml-border-radius: 3px; border-radius: 3px; padding:12px 10px; font-family: 'PT Sans Caption', sans-serif; margin:8px 10px 0 0; font-size:18px; width:440px; font-weight:700;" value="" placeholder="Email" />
+                </div>
+                <div>
+                    <input type="password" id="password" name="password" style="background-color:#dddddd; color:#525252; border:0; -moz-border-radius: 3px; -webkit-border-radius: 3px; -o-border-radius: 3px; -ms-border-radius: 3px; -khtml-border-radius: 3px; border-radius: 3px; padding:12px 10px; font-family: 'PT Sans Caption', sans-serif; margin:8px 10px 0 0; font-size:18px; width:440px; font-weight:700;" value="" placeholder="Password" />
+                </div>
+                <span class="login-error form-error"></span>
+                <span class="password-error form-error"></span>
+                <div class="__all__-error form-error"></div>
+
+                <a style="float:left; font-size:14px; margin-left:4px; line-height:56px; cursor:pointer;" onclick="showSignup();">Sign Up</a>
+                <a style="float:left; font-size:14px; margin-left:24px; line-height:56px; cursor:pointer;" onclick="resetPassword();">Forgot Password</a>
+
+                <input class="flat-button" id="sign_submit" type="submit" value="Sign in" style="width:142px; float:right; height:36px; font-size:11px; line-height: 34px; margin-top:12px;" />
+                <div id="error" style="float:right; font-size:11px; color:#ea2929; line-height:52px; margin-right:12px; font-weight:700;"></div>
+                <div class="clear"></div>
+            </form>
+        </div>
+
+        <div id="messagebox" style="float:left; text-align:center; width:100%; font-size:24px; display:none"></div>
+
+        <div id="signup_form" style="float:left; text-align:center; width:100%; display:none;">
+
+            <div style="font-size:24px; margin-bottom:24px; color:#626262;"><strong>Sign Up</strong></div>
+
+            <form class="signup-form" method="post" action="/accounts/signup/" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next_url }}" />
+                <div>
+                    <input type="text" id="first_name" name="first_name" style="background-color:#dddddd; color:#525252; border:0; -moz-border-radius: 3px; -webkit-border-radius: 3px; -o-border-radius: 3px; -ms-border-radius: 3px; -khtml-border-radius: 3px; border-radius: 3px; padding:12px 10px; font-family: 'PT Sans Caption', sans-serif; margin:8px 10px 0 0; font-size:18px; width:440px; font-weight:700;" value="" placeholder="First Name" />
+                    <span class="first_name-error form-error"></span>
+                </div>
+                <div>
+                    <input type="text" id="last_name" name="last_name" style="background-color:#dddddd; color:#525252; border:0; -moz-border-radius: 3px; -webkit-border-radius: 3px; -o-border-radius: 3px; -ms-border-radius: 3px; -khtml-border-radius: 3px; border-radius: 3px; padding:12px 10px; font-family: 'PT Sans Caption', sans-serif; margin:8px 10px 0 0; font-size:18px; width:440px; font-weight:700;" value="" placeholder="Last Name" />
+                    <span class="last_name-error form-error"></span>
+                </div>
+                <div>
+                    <input type="text" id="email" name="email" style="background-color:#dddddd; color:#525252; border:0; -moz-border-radius: 3px; -webkit-border-radius: 3px; -o-border-radius: 3px; -ms-border-radius: 3px; -khtml-border-radius: 3px; border-radius: 3px; padding:12px 10px; font-family: 'PT Sans Caption', sans-serif; margin:8px 10px 0 0; font-size:18px; width:440px; font-weight:700;" value="" placeholder="Email" />
+                    <span class="email-error form-error"></span>
+                </div>
+                <div>
+                    <input type="password" id="password1" name="password1" style="background-color:#dddddd; color:#525252; border:0; -moz-border-radius: 3px; -webkit-border-radius: 3px; -o-border-radius: 3px; -ms-border-radius: 3px; -khtml-border-radius: 3px; border-radius: 3px; padding:12px 10px; font-family: 'PT Sans Caption', sans-serif; margin:8px 10px 0 0; font-size:18px; width:440px; font-weight:700;" value="" placeholder="Password" />
+                    <span class="password1-error form-error"></span>
+                </div>
+                <div>
+                    <input type="password" id="password2" name="password2" style="background-color:#dddddd; color:#525252; border:0; -moz-border-radius: 3px; -webkit-border-radius: 3px; -o-border-radius: 3px; -ms-border-radius: 3px; -khtml-border-radius: 3px; border-radius: 3px; padding:12px 10px; font-family: 'PT Sans Caption', sans-serif; margin:8px 10px 0 0; font-size:18px; width:440px; font-weight:700;" value="" placeholder="Confirm Password" />
+                    <span class="password2-error form-error"></span>
+                </div>
+                <div class="__all__-error form-error"></div>
+                <div>
+                    <a style="float:left; font-size:14px; font-weight:700; margin-left:4px; line-height:52px; cursor:pointer;" onclick="showSignin();">Sign In</a>
+                    <input class="flat-button" id="signup_submit" type="submit" value="Sign up" style="width:142px; float:right; height:36px; font-size:11px; margin-top:9px;" />
+                    <div id="error-signup" style="float:right; font-size:11px; color:#ea2929; line-height:52px; margin:1px 12px -1px 0; font-weight:700;"></div>
+                </div>
+                <div class="form-loading">
+                    <img src="/static/pictures/loading.gif" />
+                </div>
+            </form>
+        </div>        
+
+    {% endif %}
+</div>
+
+<script>
+
+var messageTimeoutId = null;
+
+function showSignup() {
+    $('#signin_form').hide();
+    $('#messagebox').hide();
+    $('#signup_form').show();    
+}
+
+function showSignin() {
+    $('#signup_form').hide();
+    $('#messagebox').hide();
+    $('#signin_form').show();
+}
+
+function showMessage(text, timeout) {
+    $('#signin_form, #signup_form').hide();
+    $('#messagebox').html(text).show();    
+    clearTimeout(messageTimeoutId);
+
+    if (timeout) {
+        messageTimeoutId = setTimeout(function(){
+            close_signin_overlay();
+            setTimeout(showSignin, 1000);
+        }, timeout);    
+    }
+}
+
+function resetPassword() {
+
+    var form = $('#signin_form .auth-form');    
+    var login = form.find('input[name=login]');
+
+    if (!/^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(login.val())) {
+        alert("Please enter a valid email address");
+        login.focus();
+        return;
+    }
+
+    var email = login.val();
+    var postdata = form.serializeArray();
+    postdata.push({'name':'email', 'value':email});
+
+    showMessage('Sending you an email...');
+
+    var $posting = $.post(
+        "/accounts/password/reset/", postdata
+    )
+    .always(function (data) {        
+        showMessage('We sent an email to '+email+' with instructions on how to reset your password', 6000);        
+    });
+}
+
+$('form.auth-form').each(function(i,f) {
+    var $form = $(f);
+
+    $form.submit(function( event ) {
+        event.preventDefault();
+
+        $('#sign_submit').addClass('flat-button-loading');
+        $("#sign_submit").css('font-size', '0');
+
+        var posting = $.post(
+            $form.attr("action"), $form.serializeArray()
+        )
+        .always(function( data ) {
+            $('#sign_submit').removeClass('flat-button-loading');
+            $("#sign_submit").css('font-size', '11px');
+        })
+        .done(function( data ) {
+            if (data['location']=='/accounts/confirm-email/') {
+
+                var email = $form.find('input[name=login]').val();
+                showMessage('To complete your signup, please follow the instructions sent to '+email, 6000);
+
+            } else {
+                window.location = data['location'];
+            }
+        })
+        .fail(function( data ) {
+            try{
+
+               
+                var response = $.parseJSON(data.responseText);
+
+                if (response.form_errors) {
+
+                    // If Login error exists
+                    if (response.form_errors.login) {
+                        if (response.form_errors.login == "This field is required.") {
+                            $('#error').html("Email missing");
+                            setTimeout(function() { $('#error').html(""); }, 2800);
+                        }
+                        else if (response.form_errors.login == "Enter a valid email address.") {
+                            $('#error').html("Invalid email");
+                            setTimeout(function() { $('#error').html(""); }, 2800);
+                        }
+                        else {
+                            alert(response.form_errors.login);
+                        }
+                        $('#login').focus();
+                    }
+                    // If Password error
+                    else if (response.form_errors.password) {
+
+                        if (response.form_errors.password == "This field is required.") {
+                            $('#error').html("Password missing");
+                            setTimeout(function() { $('#error').html(""); }, 2800);
+                        }
+                        else {
+                            alert(response.form_errors.password);
+                        }
+
+                        $('#password').focus();
+                    }
+                    else if (response.form_errors.__all__) {
+                        if (response.form_errors.__all__ == "The e-mail address and/or password you specified are not correct.") {
+                            alert("The email address and/or password are incorrect. Use Forgot Password link to recover password if lost.");
+                        }
+                        else {
+                            alert(response.form_errors.__all__);
+                        }
+                    }
+                }   
+            } catch (e) {
+                alert('Oops, we had a problem :( Please try again or contact us if this problem continues.');
+            }
+            
+        });
+    });
+});
+
+$('form.signup-form').each(function(i,f) {
+    var $form = $(f);
+
+    $form.submit(function( event ) {
+        event.preventDefault();
+
+        $('#signup_submit').addClass('flat-button-loading');
+        $("#signup_submit").attr('value', ''); //versions older than 1.6
+        $("#signup_submit").prop('value', ''); //versions newer than 1.6
+
+        var posting = $.post(
+            $form.attr("action"), $form.serializeArray()
+        )
+        .always(function( data ) {
+            $('#signup_submit').removeClass('flat-button-loading');
+            $("#signup_submit").attr('value', 'Sign up'); //versions older than 1.6
+            $("#signup_submit").prop('value', 'Sign up'); //versions newer than 1.6
+        })
+        .done(function( data ) {
+            var email = $form.find('input[name=email]').val();
+            showMessage('We sent an email to '+email+' with instructions on how to complete your signup', 6000);
+        })
+        .fail(function( data ) {
+            try{
+
+                var response = $.parseJSON(data.responseText);
+
+                if (response.form_errors) {
+
+                    if (response.form_errors.first_name) {
+                        if (response.form_errors.first_name == "This field is required.") {
+                            $('#error-signup').html("First name missing");
+                            setTimeout(function() { $('#error-signup').html(""); }, 2800);
+                        }
+                        else {
+                            alert(response.form_errors.first_name);
+                        }
+
+                        $('#first_name').focus();
+                    }
+                    else if (response.form_errors.last_name) {
+                        if (response.form_errors.last_name == "This field is required.") {
+                            $('#error-signup').html("Last name missing");
+                            setTimeout(function() { $('#error-signup').html(""); }, 2800);
+                        }
+                        else {
+                            alert(response.form_errors.last_name);
+                        }
+
+                        $('#last_name').focus();
+                    }
+                    else if (response.form_errors.email) {
+                        if (response.form_errors.email == "This field is required.") {
+                            $('#error-signup').html("Email missing");
+                            setTimeout(function() { $('#error-signup').html(""); }, 2800);
+                        }
+                        else if (response.form_errors.email == "Enter a valid email address.") {
+                            $('#error-signup').html("Invalid email");
+                            setTimeout(function() { $('#error').html(""); }, 2800);
+                        }
+                        else {
+                            alert(response.form_errors.email);
+                        }
+
+                        $('#email').focus();
+                    }
+                    // If password1 error exists
+                    else if (response.form_errors.password1) {
+                        if (response.form_errors.password1 == "This field is required.") {
+                            $('#error-signup').html("Password missing");
+                            setTimeout(function() { $('#error').html(""); }, 2800);
+                        }
+                        else {
+                            alert(response.form_errors.password1);
+                        }
+                        $('#password1').focus();
+                    }
+                    // If password2 error exists
+                    else if (response.form_errors.password2) {
+                        if (response.form_errors.password2 == "This field is required.") {
+                            $('#error-signup').html("Password confirm missing");
+                            setTimeout(function() { $('#error').html(""); }, 2800);
+                        }
+                        else {
+                            alert(response.form_errors.password2);
+                        }
+                        $('#password2').focus();
+                    }
+                    else if (response.form_errors.__all__) {
+                        alert(response.form_errors.__all__);
+                    }
+                }   
+            } catch (e) {
+                alert('Oops, we had a problem :( Please try again or contact us if this problem continues.');
+            }
+        });
+    });
+});
+</script>
